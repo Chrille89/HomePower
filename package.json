@@ -22,7 +22,13 @@
   "homepage": "https://github.com/Chrille89/HomePower#readme",
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "@types/ws": "^8.18.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "mqtt": "^5.14.0",
+    "node-fetch": "^3.3.2",
+    "ws": "^8.18.3"
   }
 }

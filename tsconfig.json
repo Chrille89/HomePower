@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2020",          // moderne JS Features
-    "module": "ES2020",          // ESM
+    "target": "es2024",          // moderne JS Features
+    "module": "nodenext",         // ESM
+    "resolveJsonModule": true,
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   }
