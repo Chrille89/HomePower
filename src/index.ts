@@ -32,15 +32,15 @@ client.on('message', (topic, payload) => {
 
     (async () => {
         let status = await getPoolStatus()
-        //  console.log("status: ", status)
-        console.log(`Power: ${power.toFixed(2)}`)
-        if (power < -250) {
-            console.log("turn pool pump on")
+        console.log(`Power: ${power.toFixed(2)} W`)
+        if (power < process.env.NEGATIVE_THRESHOLD) {
+          //  console.log("turn pool pump on")
             status = await turnPoolPumpOn()
-        } else if (power > 300) {
-            console.log("turn pool pump off")
+        } else if (power > process.env.POSITIVE_THRESHOLD) {
+        //    console.log("turn pool pump off")
             status = await turnPoolPumpOff()
         }
+       // console.log("status: ", status)
     })()
 });
 
