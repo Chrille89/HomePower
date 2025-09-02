@@ -1,14 +1,14 @@
 export async function getPoolStatus() {
-    const response : Response = await fetch("https://svr72.supla.org/direct/1060/mZYadtShdY/read")
+    const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
     return response.json();
 }
 
 export async function turnPoolPumpOn() {
-    const response : Response = await fetch("https://svr72.supla.org/direct/1060/mZYadtShdY/turn-on")
+    const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/turn-on`)
     return response.json();
 }
 
 export async function turnPoolPumpOff() {
-    const response : Response = await fetch("https://svr72.supla.org/direct/1060/mZYadtShdY/turn-off")
+    const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/turn-off`);
     return response.json();
 }

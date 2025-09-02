@@ -1,50 +1,26 @@
 import mqtt from 'mqtt';
 import { getPoolStatus, turnPoolPumpOff, turnPoolPumpOn } from './services/poolService.js';
+import { PhasePower } from './types/phasePower.type.js';
+import dotenv from "dotenv";
+dotenv.config();
 
-var json: any = {
-    "supla/9232e133621be4e62e9cff53c1107d3d/devices/2504/channels/7916/state/phases/1/power_active": 0,
-    "supla/9232e133621be4e62e9cff53c1107d3d/devices/2504/channels/7916/state/phases/2/power_active": 0,
-    "supla/9232e133621be4e62e9cff53c1107d3d/devices/2504/channels/7916/state/phases/3/power_active": 0,
+var json: PhasePower = {
+    [`${process.env.PHASE_BASE_TOPIC}/1/power_active`]: 0,
+    [`${process.env.PHASE_BASE_TOPIC}/2/power_active`]: 0,
+    [`${process.env.PHASE_BASE_TOPIC}/3/power_active`]: 0
 }
 
-const mqttUrl = 'mqtts://mqtt72.supla.org:8883'; // z. B. mqtt://mqtt.supla.org:1883 oder mqtts://...
-const options = {
-    username: '9232e133621be4e62e9cff53c1107d3d',
-    password: 'r-ex42HvfmUOOyHipI_Yh(RjFIsiPja!',
-};
-
-
-const client = mqtt.connect(mqttUrl, options);
+const client = mqtt.connect(process.env.MQTT_HOST, {
+    username: process.env.USERNAME,
+    password: process.env.PASSWORD
+});
 
 client.on('connect', () => {
     console.log('Verbunden mit Supla MQTT Broker');
-
-    // Topic-Subscription (Beispiel):
-    client.subscribe('supla/9232e133621be4e62e9cff53c1107d3d/devices/2504/channels/7916/state/phases/1/power_active', { qos: 0 }, (err, granted) => {
-        if (err) {
-            console.error('Subscription-Fehler:', err);
-        } else {
-            console.log('Abonniert:', granted.map(g => g.topic).join(', '));
-        }
-    });
-
-    // Topic-Subscription (Beispiel):
-    client.subscribe('supla/9232e133621be4e62e9cff53c1107d3d/devices/2504/channels/7916/state/phases/2/power_active', { qos: 0 }, (err, granted) => {
-        if (err) {
-            console.error('Subscription-Fehler:', err);
-        } else {
-            console.log('Abonniert:', granted.map(g => g.topic).join(', '));
-        }
-    });
-
-    // Topic-Subscription (Beispiel):
-    client.subscribe('supla/9232e133621be4e62e9cff53c1107d3d/devices/2504/channels/7916/state/phases/3/power_active', { qos: 0 }, (err, granted) => {
-        if (err) {
-            console.error('Subscription-Fehler:', err);
-        } else {
-            console.log('Abonniert:', granted.map(g => g.topic).join(', '));
-        }
-    });
+    // subscribe all 3 phases
+    subscribe(`${process.env.PHASE_BASE_TOPIC}/1/power_active`)
+    subscribe(`${process.env.PHASE_BASE_TOPIC}/2/power_active`)
+    subscribe(`${process.env.PHASE_BASE_TOPIC}/3/power_active`)
 });
 
 
@@ -56,8 +32,8 @@ client.on('message', (topic, payload) => {
 
     (async () => {
         let status = await getPoolStatus()
-        console.log("status: ", status)
-        console.log(`Power: ${power}`)
+        //  console.log("status: ", status)
+        console.log(`Power: ${power.toFixed(2)}`)
         if (power < -250) {
             console.log("turn pool pump on")
             status = await turnPoolPumpOn()
@@ -71,3 +47,13 @@ client.on('message', (topic, payload) => {
 client.on('error', (err) => {
     console.error('MQTT-Error:', err);
 });
+
+function subscribe(topic: string) {
+    client.subscribe(topic, { qos: 0 }, (err, granted) => {
+        if (err) {
+            console.error('Subscription-Fehler:', err);
+        } else {
+            console.log('Abonniert:', granted?.map(g => g.topic).join(', '));
+        }
+    });
+}
