@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",          // moderne JS Features
+    "module": "ES2020",          // ESM
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

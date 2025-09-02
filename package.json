@@ -1,0 +1,28 @@
+{
+  "name": "homepower",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx --watch src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/Chrille89/HomePower.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chrille89/HomePower/issues"
+  },
+  "homepage": "https://github.com/Chrille89/HomePower#readme",
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
