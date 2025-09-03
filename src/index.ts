@@ -1,8 +1,12 @@
 import mqtt from 'mqtt';
-import { getPoolStatus, turnPoolPumpOff, turnPoolPumpOn } from './services/poolService.js';
+import { PoolService } from './services/poolService.js';
 import { PhasePower } from './types/phasePower.type.js';
 import dotenv from "dotenv";
+import { PoolPumpStatus } from './types/poolPumpStatus.type.js';
+import { PoolPumpActionResponse } from './types/poolPumpActionResponse.type.js';
 dotenv.config();
+
+let poolServive: PoolService;
 
 var json: PhasePower = {
     [`${process.env.PHASE_BASE_TOPIC}/1/power_active`]: 0,
@@ -17,6 +21,7 @@ const client = mqtt.connect(process.env.MQTT_HOST, {
 
 client.on('connect', () => {
     console.log('Verbunden mit Supla MQTT Broker');
+    poolServive = PoolService.getInstance()
     // subscribe all 3 phases
     subscribe(`${process.env.PHASE_BASE_TOPIC}/1/power_active`)
     subscribe(`${process.env.PHASE_BASE_TOPIC}/2/power_active`)
@@ -29,18 +34,16 @@ client.on('message', (topic, payload) => {
 
     let power = 0;
     Object.values(json).forEach((v: any) => power += v);
+    power = Math.round(power * 100) / 100;
 
     (async () => {
-        let status = await getPoolStatus()
-        console.log(`Power: ${power.toFixed(2)} W`)
-        if (power < process.env.NEGATIVE_THRESHOLD) {
-          //  console.log("turn pool pump on")
-            status = await turnPoolPumpOn()
-        } else if (power > process.env.POSITIVE_THRESHOLD) {
-        //    console.log("turn pool pump off")
-            status = await turnPoolPumpOff()
+        let status: PoolPumpStatus | undefined =  poolServive.poolStatus
+        console.log(`Power ${power} W`)
+        if ((power < process.env.NEGATIVE_THRESHOLD) && (status?.connected && !status.on)) {
+            await poolServive.turnPoolPumpOn()
+        } else if ((power > process.env.POSITIVE_THRESHOLD) && (status?.connected && status.on)) {
+            await poolServive.turnPoolPumpOff()
         }
-       // console.log("status: ", status)
     })()
 });
 
@@ -51,9 +54,9 @@ client.on('error', (err) => {
 function subscribe(topic: string) {
     client.subscribe(topic, { qos: 0 }, (err, granted) => {
         if (err) {
-            console.error('Subscription-Fehler:', err);
+            console.error('Subscription-Error:', err);
         } else {
-            console.log('Abonniert:', granted?.map(g => g.topic).join(', '));
+            console.log('Subscribed:', granted?.map(g => g.topic).join(', '));
         }
     });
 }
