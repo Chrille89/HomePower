@@ -6,8 +6,8 @@ export class PoolService {
     private static instance?: PoolService;
     poolPumpState?: PoolPumpState;
 
-    private constructor() {}
-    
+    private constructor() { }
+
     async init() {
         await this.getPoolPumpState()
     }
@@ -15,13 +15,7 @@ export class PoolService {
     static getInstance() {
         if (this.instance) return this.instance
         this.instance = new PoolService()
-        this.instance.init()
         return this.instance
-    }
-
-    private async getPoolPumpState(): Promise<void> {
-        const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
-        this.poolPumpState = await response.json();
     }
 
     async pump(on: boolean) {
@@ -35,8 +29,13 @@ export class PoolService {
         if (!poolPumpActionResponse.success) {
             throw new Error(`Cannot ${command} pool pump.`)
         }
-        await this.getPoolPumpState()
+        // await this.getPoolPumpState()
         console.log(`${command} pool pump.`);
+    }
+
+    private async getPoolPumpState(): Promise<void> {
+        const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
+        this.poolPumpState = await response.json();
     }
 }
 

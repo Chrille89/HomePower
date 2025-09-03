@@ -2,12 +2,10 @@ import mqtt from 'mqtt';
 import { PoolService } from './services/poolService.js';
 import { PhasePower } from './types/phasePower.type.js';
 import dotenv from "dotenv";
-import { PoolPumpState } from './types/poolPumpState.type.js';
-import { PoolPumpActionResponse } from './types/poolPumpActionResponse.type.js';
+import processPhasePower from './utils/processPhasePower.js';
 dotenv.config();
 
 let poolServive: PoolService;
-
 var json: PhasePower = {
     [`${process.env.PHASE_BASE_TOPIC}/1/power_active`]: 0,
     [`${process.env.PHASE_BASE_TOPIC}/2/power_active`]: 0,
@@ -22,6 +20,7 @@ const client = mqtt.connect(process.env.MQTT_HOST, {
 client.on('connect', () => {
     console.log('Verbunden mit Supla MQTT Broker');
     poolServive = PoolService.getInstance()
+    poolServive.init()
     // subscribe all 3 phases
     subscribe(`${process.env.PHASE_BASE_TOPIC}/1/power_active`)
     subscribe(`${process.env.PHASE_BASE_TOPIC}/2/power_active`)
@@ -31,20 +30,7 @@ client.on('connect', () => {
 
 client.on('message', (topic, payload) => {
     json[topic] = parseFloat(payload.toString());
-
-    let power = 0;
-    Object.values(json).forEach((v: any) => power += v);
-    power = Math.round(power * 100) / 100;
-
-    (async () => {
-        let status: PoolPumpState | undefined =  poolServive.poolPumpState
-        console.log(`Power ${power} W`)
-        if ((power < process.env.NEGATIVE_THRESHOLD) && (status?.connected && !status.on)) {
-            await poolServive.pump(true)
-        } else if ((power > process.env.POSITIVE_THRESHOLD) && (status?.connected && status.on)) {
-            await poolServive.pump(false)
-        }
-    })()
+    processPhasePower(json, poolServive)
 });
 
 client.on('error', (err) => {
