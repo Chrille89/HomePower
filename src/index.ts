@@ -2,7 +2,7 @@ import mqtt from 'mqtt';
 import { PoolService } from './services/poolService.js';
 import { PhasePower } from './types/phasePower.type.js';
 import dotenv from "dotenv";
-import { PoolPumpStatus } from './types/poolPumpStatus.type.js';
+import { PoolPumpState } from './types/poolPumpState.type.js';
 import { PoolPumpActionResponse } from './types/poolPumpActionResponse.type.js';
 dotenv.config();
 
@@ -37,12 +37,12 @@ client.on('message', (topic, payload) => {
     power = Math.round(power * 100) / 100;
 
     (async () => {
-        let status: PoolPumpStatus | undefined =  poolServive.poolStatus
+        let status: PoolPumpState | undefined =  poolServive.poolPumpState
         console.log(`Power ${power} W`)
         if ((power < process.env.NEGATIVE_THRESHOLD) && (status?.connected && !status.on)) {
-            await poolServive.turnPoolPumpOn()
+            await poolServive.pump(true)
         } else if ((power > process.env.POSITIVE_THRESHOLD) && (status?.connected && status.on)) {
-            await poolServive.turnPoolPumpOff()
+            await poolServive.pump(false)
         }
     })()
 });

@@ -1,52 +1,42 @@
-import { PoolPumpStatus } from "../types/poolPumpStatus.type.js";
+import { PoolPumpState } from "../types/poolPumpState.type.js";
 import { PoolPumpActionResponse } from "../types/poolPumpActionResponse.type.js";
 
 export class PoolService {
 
     private static instance?: PoolService;
-    private poolPumpStatus?: PoolPumpStatus;
+    poolPumpState?: PoolPumpState;
 
+    private constructor() {}
+    
     async init() {
-        await this.setPoolStatus()
+        await this.getPoolPumpState()
     }
 
     static getInstance() {
-        if(this.instance) return this.instance
+        if (this.instance) return this.instance
         this.instance = new PoolService()
         this.instance.init()
         return this.instance
     }
 
-    get poolStatus(): PoolPumpStatus | undefined {
-        return this.poolPumpStatus
-  }
-
-    private async setPoolStatus() : Promise<void> {
+    private async getPoolPumpState(): Promise<void> {
         const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
-        this.poolPumpStatus = await response.json();
+        this.poolPumpState = await response.json();
     }
 
-    async turnPoolPumpOn(): Promise<void> {
-        if(this.poolPumpStatus) this.poolPumpStatus.on = true
-        const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/turn-on`)
-        const poolPumpActionResponse : PoolPumpActionResponse = await response.json()
-        if(!poolPumpActionResponse.success) {
-            throw new Error("Could not turn pool pump on.")
+    async pump(on: boolean) {
+        let command = "turn-off"
+        if (on) {
+            command = "turn-on"
         }
-        console.log("turn pool pump on.");
-    }
-
-    async turnPoolPumpOff(): Promise<void> {
-        if(this.poolPumpStatus) this.poolPumpStatus.on = false
-        const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/turn-off`)
-        const poolPumpActionResponse : PoolPumpActionResponse = await response.json()
-        if(!poolPumpActionResponse.success) {
-            throw new Error("Could not turn pool pump off.")
+        if (this.poolPumpState) this.poolPumpState.on = on
+        const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/${command}`)
+        const poolPumpActionResponse: PoolPumpActionResponse = await response.json()
+        if (!poolPumpActionResponse.success) {
+            throw new Error(`Cannot ${command} pool pump.`)
         }
-        console.log("turn pool pump off.");
-        
+        await this.getPoolPumpState()
+        console.log(`${command} pool pump.`);
     }
-
-
 }
 

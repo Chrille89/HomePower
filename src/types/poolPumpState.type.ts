@@ -1,4 +1,4 @@
-export type PoolPumpStatus = {
+export type PoolPumpState = {
     "connected": boolean,
     "connectedCode": string,
     "on": boolean,
