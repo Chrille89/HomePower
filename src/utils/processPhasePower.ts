@@ -9,7 +9,6 @@ export default function processPhasePower(json: PhasePower, service: PoolService
 
     (async () => {
         let status: PoolPumpState | undefined = service.poolPumpState
-        console.log(`Power ${power} W`)
         if ((power < process.env.NEGATIVE_THRESHOLD) && (status?.connected && !status.on)) {
             await service.pump(true)
         } else if ((power > process.env.POSITIVE_THRESHOLD) && (status?.connected && status.on)) {

@@ -18,9 +18,10 @@ const client = mqtt.connect(process.env.MQTT_HOST, {
 });
 
 client.on('connect', () => {
-    console.log('Verbunden mit Supla MQTT Broker');
+    console.log('Connected with Supla MQTT Broker.');
     poolServive = PoolService.getInstance()
     poolServive.init()
+
     // subscribe all 3 phases
     subscribe(`${process.env.PHASE_BASE_TOPIC}/1/power_active`)
     subscribe(`${process.env.PHASE_BASE_TOPIC}/2/power_active`)
