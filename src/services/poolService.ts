@@ -29,7 +29,6 @@ export class PoolService {
         if (!poolPumpActionResponse.success) {
             throw new Error(`Cannot ${command} pool pump.`)
         }
-        // await this.getPoolPumpState()
         console.log(`${command} pool pump.`);
     }
 
