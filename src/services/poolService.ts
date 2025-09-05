@@ -20,14 +20,25 @@ export class PoolService {
     }
 
     async pump(on: boolean) {
-        let command = "turn-off"
-        if (on) {
-            command = "turn-on"
+        try {
+            let command = "turn-off"
+            if (on) {
+                command = "turn-on"
+            }
+            const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/${command}`)
+            const respText = await response.text()
+            let respJson;
+            try {
+                respJson = JSON.parse(respText)
+            } catch (error) {
+                throw new Error(`Response ${respText} is not json! Response: ${response}`)
+            }
+            const poolPumpActionResponse: PoolPumpActionResponse = respJson as PoolPumpActionResponse
+            if (!poolPumpActionResponse.success) throw new Error(`Cannot ${command} pool pump.`)
+            console.log(`${command} pool pump.`);
+        } catch (error) {
+            throw new Error(`Error pump function: ${error}`)
         }
-        const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/${command}`)
-        const poolPumpActionResponse: PoolPumpActionResponse = (await response.json()) as PoolPumpActionResponse
-        if (!poolPumpActionResponse.success) throw new Error(`Cannot ${command} pool pump.`)
-        console.log(`${command} pool pump.`);
     }
 
     async getPoolPumpState(): Promise<void> {

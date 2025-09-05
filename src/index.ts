@@ -38,7 +38,7 @@ client.on('message', (topic, payload) => {
 
     (async () => {
         let status: PoolPumpState | undefined = poolServive.poolPumpState
-        // console.log("Power: ", power)
+        console.log("Power: ",power)
         if ((power < process.env.NEGATIVE_THRESHOLD) && (status?.connected && !status.on)) {
             await poolServive.pump(true)
         } else if ((power > process.env.POSITIVE_THRESHOLD) && (status?.connected && status.on)) {
