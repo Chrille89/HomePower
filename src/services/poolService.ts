@@ -1,6 +1,6 @@
 import { PoolPumpState } from "../types/poolPumpState.type.js";
 import { PoolPumpActionResponse } from "../types/poolPumpActionResponse.type.js";
-import fetch from 'node-fetch';
+import fetch, { Response } from "node-fetch";
 
 export class PoolService {
 
@@ -25,14 +25,14 @@ export class PoolService {
             command = "turn-on"
         }
         const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/${command}`)
-        const poolPumpActionResponse: PoolPumpActionResponse = await response.json()
+        const poolPumpActionResponse: PoolPumpActionResponse = (await response.json()) as PoolPumpActionResponse
         if (!poolPumpActionResponse.success) throw new Error(`Cannot ${command} pool pump.`)
         console.log(`${command} pool pump.`);
     }
 
     async getPoolPumpState(): Promise<void> {
         const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
-        this.poolPumpState = await response.json();
+        this.poolPumpState = (await response.json()) as PoolPumpState;
     }
 }
 
