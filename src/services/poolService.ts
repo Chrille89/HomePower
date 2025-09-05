@@ -1,5 +1,6 @@
 import { PoolPumpState } from "../types/poolPumpState.type.js";
 import { PoolPumpActionResponse } from "../types/poolPumpActionResponse.type.js";
+import fetch from 'node-fetch';
 
 export class PoolService {
 
