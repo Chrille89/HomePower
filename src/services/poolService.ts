@@ -23,16 +23,13 @@ export class PoolService {
         if (on) {
             command = "turn-on"
         }
-        if (this.poolPumpState) this.poolPumpState.on = on
         const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/${command}`)
         const poolPumpActionResponse: PoolPumpActionResponse = await response.json()
-        if (!poolPumpActionResponse.success) {
-            throw new Error(`Cannot ${command} pool pump.`)
-        }
+        if (!poolPumpActionResponse.success) throw new Error(`Cannot ${command} pool pump.`)
         console.log(`${command} pool pump.`);
     }
 
-    private async getPoolPumpState(): Promise<void> {
+    async getPoolPumpState(): Promise<void> {
         const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
         this.poolPumpState = await response.json();
     }
