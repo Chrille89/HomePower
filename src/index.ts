@@ -3,7 +3,10 @@ import { PhasePower } from './types/phasePower.type.js';
 import { PoolPumpState } from './types/poolPumpState.type.js';
 import { pump, getPoolPumpState } from './utils/poolUtils.js';
 import dotenv from "dotenv";
+import WeatherService from './services/weatherService.js';
 dotenv.config();
+
+let weatherService: WeatherService;
 
 var json: PhasePower = {
     [`${process.env.PHASE_BASE_TOPIC}/1/power_active`]: 0,
@@ -18,7 +21,7 @@ const client = mqtt.connect(process.env.MQTT_HOST, {
 
 client.on('connect', () => {
     console.log('Connected with Supla MQTT Broker.');
-
+    weatherService = new WeatherService()
     // subscribe all 3 phases
     subscribe(`${process.env.PHASE_BASE_TOPIC}/1/power_active`)
     subscribe(`${process.env.PHASE_BASE_TOPIC}/2/power_active`)
@@ -35,13 +38,13 @@ client.on('message', (topic, payload) => {
 
     (async () => {
         let poolPumpState: PoolPumpState;
-        console.log("Power: ",power)
+        console.log("Power: ", power)
         if (power < process.env.NEGATIVE_THRESHOLD) {
             poolPumpState = await getPoolPumpState()
-            if(!poolPumpState.on) await pump(true)
-        } else if (power > process.env.POSITIVE_THRESHOLD) {
+            if (!poolPumpState.on) await pump(true)
+        } else if (power > process.env.POSITIVE_THRESHOLD && await weatherService.isSunShining()) {
             poolPumpState = await getPoolPumpState()
-            if(poolPumpState.on) await pump(false)
+            if (poolPumpState.on) await pump(false)
         }
     })()
 });
