@@ -1,4 +1,5 @@
 import { DailyCloudCoverResponse } from "../types/dailyCloudCoverResponse.type.js"
+import fetch from "node-fetch";
 
 export default class WeatherService {
 
@@ -15,7 +16,7 @@ export default class WeatherService {
         // Ansonsten neue Daten holen
         const res = await fetch(process.env.OPEN_METEO_WEATHER_URL);
         if (!res.ok) throw new Error(`API error: ${res.statusText}`);
-        const data: DailyCloudCoverResponse = await res.json();
+        const data: DailyCloudCoverResponse = (await res.json()) as DailyCloudCoverResponse;
 
         // Im Cache speichern
         this.weatherCache = { data, timestamp: now };

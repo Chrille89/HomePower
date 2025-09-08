@@ -1,5 +1,6 @@
 import { PoolPumpState } from "../types/poolPumpState.type.js";
 import { PoolPumpActionResponse } from "../types/poolPumpActionResponse.type.js";
+import fetch, { Response } from "node-fetch";
 
 export async function pump(on: boolean) {
     try {
@@ -25,7 +26,7 @@ export async function pump(on: boolean) {
 
 export async function getPoolPumpState(): Promise<PoolPumpState> {
     const response: Response = await fetch(`${process.env.POOL_PUMP_BASE_TOPIC}/read`)
-    return response.json()
+    return response.json() as Promise<PoolPumpState>
 }
 
 
