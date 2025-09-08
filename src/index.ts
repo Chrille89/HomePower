@@ -38,14 +38,16 @@ client.on('message', (topic, payload) => {
 
     (async () => {
         let poolPumpState: PoolPumpState;
-        console.log("Power: ", power)
-        if (power < process.env.NEGATIVE_THRESHOLD) {
-            poolPumpState = await getPoolPumpState()
-            if (!poolPumpState.on) await pump(true)
-        } else if (power > process.env.POSITIVE_THRESHOLD && await weatherService.isSunShining()) {
-            poolPumpState = await getPoolPumpState()
-            if (poolPumpState.on) await pump(false)
-        }
+        if (!await weatherService.isCloudy()) {
+            console.log("Power: ", power)
+            if (power < process.env.NEGATIVE_THRESHOLD) {
+                poolPumpState = await getPoolPumpState()
+                if (!poolPumpState.on) await pump(true)
+            } else if (power > process.env.POSITIVE_THRESHOLD) {
+                poolPumpState = await getPoolPumpState()
+                if (poolPumpState.on) await pump(false)
+            }
+        } 
     })()
 });
 
