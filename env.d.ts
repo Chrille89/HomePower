@@ -9,5 +9,6 @@ declare namespace NodeJS {
         POSITIVE_THRESHOLD: number
         OPEN_METEO_WEATHER_URL: string
         OPEN_METEO_CACHE_TTL_MS: number
+        OPEN_METEO_CLOUD_COVER: number
     }
 }

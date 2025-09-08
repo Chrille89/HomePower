@@ -28,7 +28,7 @@ export default class WeatherService {
         const current = (await this.getWeather()).current;
 
         const isDay = current.is_day === 1;
-        const fewClouds = current.cloud_cover < 50;
+        const fewClouds = current.cloud_cover < process.env.OPEN_METEO_CLOUD_COVER;
         const clearWeatherCodes = [0, 1, 2]; // Klar bis leicht bewölkt
 
         return isDay && fewClouds && clearWeatherCodes.includes(current.weather_code);
