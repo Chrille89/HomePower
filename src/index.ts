@@ -31,13 +31,12 @@ client.on('connect', () => {
 
 client.on('message', (topic, payload) => {
     (async () => {
-        let poolPumpState: PoolPumpState;
         if (!await weatherService.isCloudy()) {
+            let poolPumpState: PoolPumpState;
             json[topic] = parseFloat(payload.toString());
             let power = 0;
             Object.values(json).forEach((v: any) => power += v);
             power = Math.round(power * 100) / 100;
-            console.log("Power: ", power)
             if (power < process.env.NEGATIVE_THRESHOLD) {
                 poolPumpState = await getPoolPumpState()
                 if (!poolPumpState.on) await pump(true)

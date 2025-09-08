@@ -24,9 +24,7 @@ export default class WeatherService {
     }
 
     async isCloudy(): Promise<boolean> {
-        const dailyCloudCoverResponse : DailyCloudCoverResponse = (await this.getWeather())
-        const cloud_cover = dailyCloudCoverResponse.daily.cloud_cover_mean[0]
-       // console.log("cloud_cover: ",cloud_cover)
-        return cloud_cover > process.env.OPEN_METEO_MAX_CLOUD
+        const dailyCloudCoverResponse: DailyCloudCoverResponse = (await this.getWeather())
+        return dailyCloudCoverResponse.daily.cloud_cover_mean[0] > process.env.OPEN_METEO_MAX_CLOUD
     }
 }
