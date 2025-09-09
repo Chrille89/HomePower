@@ -11,8 +11,7 @@
     "dev": "tsx --watch src/index.ts"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://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@github.com/Chrille89/HomePower.git"
+    "type": "git"
   },
   "keywords": [],
   "author": "",
